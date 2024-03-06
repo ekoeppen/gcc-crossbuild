@@ -1,5 +1,5 @@
 TARGET ?=          avr
-PREFIX ?=          /opt
+PREFIX ?=          /var/tmp/${TARGET}
 NPROC  ?=          1
 
 BINUTILS ?=        2.42
@@ -14,20 +14,25 @@ else
 PICOLIBC_TARGET = ${TARGET}
 endif
 
-base_dir :=        ${HOME}/Documents/Dev/gcc-crossbuild
+base_dir :=        /var/tmp/gcc-crossbuild
 download_dir :=    ${base_dir}/download
 source_dir :=      ${base_dir}/source
 build_dir :=       ${base_dir}/build/${TARGET}
 
-binutils_url :=    https://ftpmirror.gnu.org/pub/gnu/ftp.gnu.org/pub/gnu/binutils/binutils-${BINUTILS}.tar.gz
+binutils_url :=    https://ftpmirror.gnu.org/gnu/binutils/binutils-${BINUTILS}.tar.gz
 binutils_file :=   ${download_dir}/binutils-${BINUTILS}.tar.gz
 binutils_src :=    ${source_dir}/binutils-${BINUTILS}
 binutils_build :=  ${build_dir}/binutils-${BINUTILS}
 
-gcc_url :=         https://ftpmirror.gnu.org/pub/gnu/ftp.gnu.org/pub/gnu//gcc/gcc-${GCC}/gcc-${GCC}.tar.gz
+gcc_url :=         https://ftpmirror.gnu.org/gnu/gcc/gcc-${GCC}/gcc-${GCC}.tar.gz
 gcc_file :=        ${download_dir}/gcc-${GCC}.tar.gz
 gcc_src :=         ${source_dir}/gcc-${GCC}
 gcc_build :=       ${build_dir}/gcc-${GCC}
+
+avrlibc_url :=     https://github.com/avrdudes/avr-libc/archive/${AVR_LIBC}.tar.gz
+avrlibc_file :=    ${download_dir}/avr-libc-${AVR_LIBC}.tar.gz
+avrlibc_src :=     ${source_dir}/avr-libc-${AVR_LIBC}
+avrlibc_build :=   ${build_dir}/avr-libc-${AVR_LIBC}
 
 picolibc_url :=    https://github.com/picolibc/picolibc/releases/download/${PICOLIBC}/picolibc-${PICOLIBC}.tar.xz
 picolibc_file :=   ${download_dir}/picolibc-${PICOLIBC}.tar.xz
@@ -87,6 +92,7 @@ ${gcc_file}: ${download_dir}
 
 ${gcc_src}: ${source_dir} ${gcc_file}
 	tar -C ${source_dir} -xf ${gcc_file}
+	sed -ibak 's/__AVR__/__AVR_LIBC__/g' ${gcc_src}/libstdc++-v3/src/filesystem/ops-common.h
 	cd ${gcc_src} && ./contrib/download_prerequisites
 
 config_gcc: ${gcc_src} ${gcc_build}
@@ -118,6 +124,7 @@ config_gcc: ${gcc_src} ${gcc_build}
 		--with-gnu-ld \
 		--with-libgloss \
 		--with-system-zlib \
+		--disable-multilib \
 		--with-newlib \
 		--without-libiconv-prefix
 
@@ -133,6 +140,17 @@ compile_gcc_stage2:
 install_gcc_stage2:
 	cd ${gcc_build} && make install-strip
 
+# ---- avr-libc ---------------------------------------------------------------
+
+${avrlibc_build}:
+	mkdir -p $@
+
+${avrlibc_file}: ${download_dir}
+	curl -q -o $@ -L ${avrlibc_url}
+
+${avrlibc_src}: ${source_dir} ${avrlibc_file}
+	tar -C ${source_dir} -xf ${avrlibc_file}
+
 # ---- picolibc ---------------------------------------------------------------
 
 ${picolibc_build}:
@@ -141,8 +159,11 @@ ${picolibc_build}:
 ${picolibc_file}: ${download_dir}
 	curl -q -o $@ -L ${picolibc_url}
 
-${picolibc_src}: ${source_dir} ${picolibc_file}
+${picolibc_src}: ${source_dir} ${picolibc_file} ${avrlibc_src}
 	tar -C ${source_dir} -xf ${picolibc_file}
+	mkdir -p ${PREFIX}/${TARGET}/include/avr/
+	cp -R ${avrlibc_src}/include/avr/*.h ${PREFIX}/${TARGET}/include/avr/
+	touch ${PREFIX}/${TARGET}/include/avr/version.h
 
 config_picolibc: ${picolibc_src} ${picolibc_build}
 	cd ${picolibc_build} && \
