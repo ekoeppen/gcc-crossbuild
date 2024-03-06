@@ -33,16 +33,6 @@ picolibc_file :=   ${download_dir}/picolibc-${PICOLIBC}.tar.xz
 picolibc_src :=    ${source_dir}/picolibc-${PICOLIBC}
 picolibc_build :=  ${build_dir}/picolibc-${PICOLIBC}
 
-avrlibc_url :=     https://github.com/avrdudes/avr-libc/archive/${AVR_LIBC}.tar.gz
-avrlibc_file :=    ${download_dir}/avr-libc-${AVR_LIBC}.tar.gz
-avrlibc_src :=     ${source_dir}/avr-libc-${AVR_LIBC}
-avrlibc_build :=   ${build_dir}/avr-libc-${AVR_LIBC}
-
-newlib_url :=      https://github.com/bminor/newlib/archive/refs/tags/newlib-${NEWLIB}.tar.gz
-newlib_file :=     ${download_dir}/newlib-${NEWLIB}.tar.gz
-newlib_src :=      ${source_dir}/newlib-newlib-${NEWLIB}
-newlib_build :=    ${build_dir}/newlib-newlib-${NEWLIB}
-
 .PHONY: clean clean_download clean_source clean_build \
 	compile_binutils config_binutils install_binutils \
 	compile_picolibc config_picolibc install_picolibc \
@@ -142,64 +132,6 @@ compile_gcc_stage2:
 install_gcc_stage2:
 	cd ${gcc_build} && make install-strip
 
-# ---- avr-libc ---------------------------------------------------------------
-
-${avrlibc_build}:
-	mkdir -p $@
-
-${avrlibc_file}: ${download_dir}
-	curl -q -o $@ -L ${avrlibc_url}
-
-${avrlibc_src}: ${source_dir} ${avrlibc_file}
-	tar -C ${source_dir} -xf ${avrlibc_file}
-	cd ${avrlibc_src} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		./bootstrap
-
-config_avrlibc: ${avrlibc_src} ${avrlibc_build}
-	cd ${avrlibc_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		${avrlibc_src}/configure --prefix=${PREFIX} --host=${TARGET}
-
-compile_avrlibc:
-	cd ${avrlibc_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		make -j ${NPROC}
-
-install_avrlibc:
-	cd ${avrlibc_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		make install
-
-# ---- newlib -----------------------------------------------------------------
-
-${newlib_build}:
-	mkdir -p $@
-
-${newlib_file}: ${download_dir}
-	curl -q -o $@ -L ${newlib_url}
-
-${newlib_src}: ${source_dir} ${newlib_file}
-	tar -C ${source_dir} -xf ${newlib_file}
-
-config_newlib: ${newlib_src} ${newlib_build}
-	cd ${newlib_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		${newlib_src}/configure \
-			--prefix=${PREFIX} \
-			--host=${TARGET} \
-			--disable-nls
-
-compile_newlib:
-	cd ${newlib_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		make -j ${NPROC}
-
-install_newlib:
-	cd ${newlib_build} && \
-		PATH=${PREFIX}/bin:"${PATH}" && \
-		make install
-
 # ---- picolibc ---------------------------------------------------------------
 
 ${picolibc_build}:
@@ -246,3 +178,8 @@ clean_build:
 	rm -rf ${gcc_build}
 
 clean: clean_download clean_source clean_build
+
+build_all: config_binutils compile_binutils install_binutils \
+	config_gcc compile_gcc_stage1 install_gcc_stage1 \
+	config_picolibc compile_picolibc install_picolibc \
+	compile_gcc_stage2 install_gcc_stage2
