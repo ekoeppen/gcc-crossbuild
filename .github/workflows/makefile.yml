@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Compile
-      run: make NPROC=4 TARGET=arm-none-eabi
+      run: make NPROC=4 TARGET=arm-none-eabi build_all
