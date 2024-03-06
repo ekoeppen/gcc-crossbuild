@@ -1,5 +1,5 @@
-PREFIX ?=          /opt
 TARGET ?=          avr
+PREFIX ?=          /opt
 NPROC  ?=          1
 
 BINUTILS ?=        2.42
@@ -8,22 +8,23 @@ PICOLIBC ?=        1.8.6
 AVR_LIBC ?=        22d588c80066102993263018d5324d1424c13f0d
 NEWLIB ?=          4.4.0
 
-PICOLIBC_arm-none-eabi = arm-none-eabi
-PICOLIBC_avr =           avr
-PICOLIBC_avr-elf =       avr
-PICOLIBC_msp430-elf=     msp430
+ifeq (${TARGET},msp430-elf)
+PICOLIBC_TARGET = msp430
+else
+PICOLIBC_TARGET = ${TARGET}
+endif
 
 base_dir :=        ${HOME}/Documents/Dev/gcc-crossbuild
 download_dir :=    ${base_dir}/download
 source_dir :=      ${base_dir}/source
 build_dir :=       ${base_dir}/build/${TARGET}
 
-binutils_url :=    https://www.nic.funet.fi/pub/gnu/ftp.gnu.org/pub/gnu/binutils/binutils-${BINUTILS}.tar.gz
+binutils_url :=    https://ftpmirror.gnu.org/pub/gnu/ftp.gnu.org/pub/gnu/binutils/binutils-${BINUTILS}.tar.gz
 binutils_file :=   ${download_dir}/binutils-${BINUTILS}.tar.gz
 binutils_src :=    ${source_dir}/binutils-${BINUTILS}
 binutils_build :=  ${build_dir}/binutils-${BINUTILS}
 
-gcc_url :=         https://www.nic.funet.fi/pub/gnu/ftp.gnu.org/pub/gnu//gcc/gcc-${GCC}/gcc-${GCC}.tar.gz
+gcc_url :=         https://ftpmirror.gnu.org/pub/gnu/ftp.gnu.org/pub/gnu//gcc/gcc-${GCC}/gcc-${GCC}.tar.gz
 gcc_file :=        ${download_dir}/gcc-${GCC}.tar.gz
 gcc_src :=         ${source_dir}/gcc-${GCC}
 gcc_build :=       ${build_dir}/gcc-${GCC}
@@ -151,7 +152,7 @@ config_picolibc: ${picolibc_src} ${picolibc_build}
 			-Dlibdir=${TARGET}/lib \
 			-Dprefix=${PREFIX} \
 			-Dnewlib-iconv-encodings-exclude=big5 \
-			--cross-file ${picolibc_src}/scripts/cross-${PICOLIBC_${TARGET}}.txt \
+			--cross-file ${picolibc_src}/scripts/cross-${PICOLIBC_TARGET}.txt \
 			${picolib_src}
 
 compile_picolibc:
