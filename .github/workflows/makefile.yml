@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  linux:
+  linux-arm:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,31 +18,15 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install Meson
       run: sudo apt-get install -y meson
-    - name: Compile ARM
-      run: make NPROC=4 TARGET=arm-none-eabi PREFIX=/var/tmp/arm-none-eabi build_all
-    - name: Compile AVR
-      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/avr build_all
-    - name: Compile MSP430
-      run: make NPROC=4 TARGET=msp430-elf PREFIX=/var/tmp/msp430-elf build_all
-    - name: Package ARM
+    - name: Compile
+      run: make NPROC=4 TARGET=arm-none-eabi PREFIX=/var/tmp/build build_all
+    - name: Package
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: "zip"
         filename: "/var/tmp/toolchain-gccarm-linux.zip"
-        directory: "/var/tmp/arm-none-eabi/"
-    - name: Package AVR
-      uses: thedoctor0/zip-release@0.7.5
-      with:
-        type: "zip"
-        filename: "/var/tmp/toolchain-gccavr-linux.zip"
-        directory: "/var/tmp/avr/"
-    - name: Package MSP430
-      uses: thedoctor0/zip-release@0.7.5
-      with:
-        type: "zip"
-        filename: "/var/tmp/toolchain-gccmsp430-linux.zip"
-        directory: "/var/tmp/msp430-elf/"
-    - name: Release ARM
+        directory: "/var/tmp/build/"
+    - name: Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/var/tmp/toolchain-gccarm-linux.zip"
@@ -50,7 +34,24 @@ jobs:
         tag: "gcc-arm-linux-13.2.0-1"
         commit: "main"
         allowUpdates: true
-    - name: Release AVR
+
+  linux-avr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Meson
+      run: sudo apt-get install -y meson
+    - name: Compile
+      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/build build_all
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: "zip"
+        filename: "/var/tmp/toolchain-gccavr-linux.zip"
+        directory: "/var/tmp/build/"
+    - name: Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/var/tmp/toolchain-gccavr-linux.zip"
@@ -58,7 +59,24 @@ jobs:
         tag: "gcc-avr-linux-13.2.0-1"
         commit: "main"
         allowUpdates: true
-    - name: Release MSP430
+
+  linux-msp430:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Meson
+      run: sudo apt-get install -y meson
+    - name: Compile
+      run: make NPROC=4 TARGET=msp430-elf PREFIX=/var/tmp/build build_all
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: "zip"
+        filename: "/var/tmp/toolchain-gccmsp430-linux.zip"
+        directory: "/var/tmp/build/"
+    - name: Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/var/tmp/toolchain-gccmsp430-linux.zip"
@@ -68,6 +86,7 @@ jobs:
         allowUpdates: true
 
   macos-aarch64:
+    if: false
     runs-on: macos-14
     permissions:
       contents: write
