@@ -150,6 +150,17 @@ ${avrlibc_file}: ${download_dir}
 ${avrlibc_src}: ${source_dir} ${avrlibc_file}
 	tar -C ${source_dir} -xf ${avrlibc_file}
 
+copy_avrio: ${avrlibc_src}
+	mkdir -p ${PREFIX}/${TARGET}/include/avr/
+	cp -R ${avrlibc_src}/include/avr/*.h ${PREFIX}/${TARGET}/include/avr/
+	touch ${PREFIX}/${TARGET}/include/avr/version.h
+
+clean_avrlibc:
+	rm -rf ${avrlibc_build}
+
+clean_avrlibc_src:
+	rm -rf ${avrlibc_file} ${avrlibc_src}
+
 # ---- picolibc ---------------------------------------------------------------
 
 ${picolibc_build}:
@@ -158,11 +169,8 @@ ${picolibc_build}:
 ${picolibc_file}: ${download_dir}
 	curl -q -o $@ -L ${picolibc_url}
 
-${picolibc_src}: ${source_dir} ${picolibc_file} ${avrlibc_src}
+${picolibc_src}: ${source_dir} ${picolibc_file} copy_avrio
 	tar -C ${source_dir} -xf ${picolibc_file}
-	mkdir -p ${PREFIX}/${TARGET}/include/avr/
-	cp -R ${avrlibc_src}/include/avr/*.h ${PREFIX}/${TARGET}/include/avr/
-	touch ${PREFIX}/${TARGET}/include/avr/version.h
 
 config_picolibc: ${picolibc_src} ${picolibc_build}
 	cd ${picolibc_build} && \
