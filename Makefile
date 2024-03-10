@@ -82,6 +82,12 @@ install_binutils:
 
 binutils: config_binutils compile_binutils install_binutils
 
+clean_binutils:
+	rm -rf ${binutils_build}
+
+clean_binutils_src:
+	rm -rf ${binutils_file} ${binutils_src}
+
 # ---- gcc --------------------------------------------------------------------
 
 ${gcc_build}:
@@ -139,6 +145,16 @@ compile_gcc_stage2:
 install_gcc_stage2:
 	cd ${gcc_build} && make install-strip
 
+gcc_stage1: config_gcc compile_gcc_stage1 install_gcc_stage1
+
+gcc_stage2: compile_gcc_stage2 install_gcc_stage2
+
+clean_gcc:
+	rm -rf ${gcc_build}
+
+clean_gcc_src:
+	rm -rf ${gcc_file} ${gcc_src}
+
 # ---- avr-libc ---------------------------------------------------------------
 
 ${avrlibc_build}:
@@ -193,6 +209,14 @@ install_picolibc:
 	cd ${picolibc_build} && \
 		PATH=${PREFIX}/bin:"${PATH}" && \
 	ninja install
+
+picolibc: config_picolibc compile_picolibc install_picolibc
+
+clean_picolibc:
+	rm -rf ${picolibc_build}
+
+clean_binutils_src:
+	rm -rf ${picolibc_file} ${picolibc_src}
 
 # ---- clean ------------------------------------------------------------------
 
