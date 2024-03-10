@@ -44,6 +44,11 @@ newlib_file :=     ${download_dir}/newlib-${NEWLIB}.tar.gz
 newlib_src :=      ${source_dir}/newlib-newlib-${NEWLIB}
 newlib_build :=    ${build_dir}/newlib-newlib-${NEWLIB}
 
+msp430sup_url :=   https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-support-files-1.212.zip
+msp430sup_file :=  ${download_dir}/msp430-gcc-support-files-1.212.zip
+msp430sup_src :=   ${source_dir}/msp430-gcc-support-files
+msp430sup_build := ${build_dir}/msp430-gcc-support-files
+
 .PHONY: clean clean_download clean_source clean_build \
 	compile_binutils config_binutils install_binutils \
 	compile_picolibc config_picolibc install_picolibc \
@@ -182,6 +187,27 @@ clean_avrlibc:
 clean_avrlibc_src:
 	rm -rf ${avrlibc_file} ${avrlibc_src}
 
+# ---- msp430 support ---------------------------------------------------------
+
+${msp430sup_build}:
+	mkdir -p $@
+
+${msp430sup_file}: ${download_dir}
+	curl -q -o $@ -L ${msp430sup_url}
+
+${msp430sup_src}: ${source_dir} ${msp430sup_file}
+	tar -C ${source_dir} -xf ${msp430sup_file}
+
+copy_msp430sup: ${msp430sup_src}
+	mkdir -p ${PREFIX}/${TARGET}/include/msp430/
+	cp -R ${msp430sup_src}/include/* ${PREFIX}/${TARGET}/include/msp430/
+
+clean_msp430sup:
+	rm -rf ${msp430sup_build}
+
+clean_msp430sup_src:
+	rm -rf ${msp430sup_file} ${msp430sup_src}
+
 # ---- newlib -----------------------------------------------------------------
 
 ${newlib_build}:
@@ -227,10 +253,18 @@ ${picolibc_build}:
 ${picolibc_file}: ${download_dir}
 	curl -q -o $@ -L ${picolibc_url}
 
-${picolibc_src}: ${source_dir} ${picolibc_file} copy_avrio
+${picolibc_src}: ${source_dir} ${picolibc_file}
 	tar -C ${source_dir} -xf ${picolibc_file}
 
-config_picolibc: ${picolibc_src} ${picolibc_build}
+ifeq (${TARGET},avr)
+picolibc_extra: copy_avrio
+else ifeq (${TARGET},msp430-elf)
+picolibc_extra: copy_msp430sup
+else
+picolibc_extra: ;
+endif
+
+config_picolibc: ${picolibc_src} ${picolibc_build} picolibc_extra
 	cd ${picolibc_build} && \
 		PATH=${PREFIX}/bin:"${PATH}" && \
 		meson setup ${picolibc_src} \
@@ -275,4 +309,4 @@ clean_build:
 
 clean: clean_download clean_source clean_build
 
-build_all: binutils gcc_stage1 newlib gcc_stage2
+build_all: binutils gcc_stage1 picolibc gcc_stage2
