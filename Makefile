@@ -171,6 +171,7 @@ config_picolibc: ${picolibc_src} ${picolibc_build}
 			-Dincludedir=${TARGET}/include \
 			-Dlibdir=${TARGET}/lib \
 			-Dprefix=${PREFIX} \
+			-Dsysroot-install=true \
 			-Dnewlib-iconv-encodings-exclude=big5 \
 			--cross-file ${picolibc_src}/scripts/cross-${PICOLIBC_TARGET}.txt \
 			${picolib_src}
