@@ -1,0 +1,33 @@
+name: Makefile CI
+
+jobs:
+  linux-avr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Meson
+      run: sudo apt-get install -y meson
+    - name: Compile binutils
+      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/build binutils
+    - name: Compile gcc stage1
+      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/build gcc_stage1
+    - name: Compile picolibc
+      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/build picolibc
+    - name: Compile gcc stage2
+      run: make NPROC=4 TARGET=avr PREFIX=/var/tmp/build gcc_stage2
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: "zip"
+        filename: "/var/tmp/toolchain-gccavr-linux.zip"
+        directory: "/var/tmp/build/"
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "/var/tmp/toolchain-gccavr-linux.zip"
+        artifactContentType: "application/zip"
+        tag: "gcc-avr-linux-13.2.0-1"
+        commit: "main"
+        allowUpdates: true

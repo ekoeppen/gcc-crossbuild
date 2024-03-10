@@ -1,0 +1,27 @@
+name: Makefile CI
+
+jobs:
+  linux-msp430:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Meson
+      run: sudo apt-get install -y meson
+    - name: Compile
+      run: make NPROC=4 TARGET=msp430-elf PREFIX=/var/tmp/build build_all
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: "zip"
+        filename: "/var/tmp/toolchain-gccmsp430-linux.zip"
+        directory: "/var/tmp/build/"
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "/var/tmp/toolchain-gccmsp430-linux.zip"
+        artifactContentType: "application/zip"
+        tag: "gcc-msp430-linux-13.2.0-1"
+        commit: "main"
+        allowUpdates: true
