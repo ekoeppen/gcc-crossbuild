@@ -1,0 +1,43 @@
+name: Linux crossbuild
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Target
+        default: arm-none-eabi
+        type: choice
+        options:
+          - arm-none-eabi
+          - msp430-elf
+          - avr
+      release:
+        description: Release
+        default: 13.2.0-1
+        type: string
+
+jobs:
+  crossbuild:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: sudo apt-get install -y meson
+    - name: Compile
+      run: make NPROC=4 TARGET=${{ inputs.target }} PREFIX=/var/tmp/build build_all
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: zip
+        filename: /var/tmp/toolchain-gcc${{ inputs.target }}-linux.zip"
+        directory: /var/tmp/build/
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: /var/tmp/toolchain-gccmsp430-elf-linux.zip
+        artifactContentType: application/zip
+        tag: gcc-${{ inputs.target }}-linux-${{ inputs.release }}
+        commit: main
+        allowUpdates: true
