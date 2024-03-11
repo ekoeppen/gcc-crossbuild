@@ -47,7 +47,8 @@ include avrlibc.mk
 include msp430sup.mk
 include newlib.mk
 include picolibc.mk
+include pio_package.mk
 
 clean: clean_download clean_source clean_build
 
-build_all: binutils gcc_stage1 picolibc gcc_stage2
+build_all: binutils gcc_stage1 picolibc gcc_stage2 pio_package

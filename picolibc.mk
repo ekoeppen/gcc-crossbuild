@@ -49,5 +49,5 @@ picolibc: config_picolibc compile_picolibc install_picolibc
 clean_picolibc:
 	rm -rf ${picolibc_build}
 
-clean_binutils_src:
+clean_picolib_src:
 	rm -rf ${picolibc_file} ${picolibc_src}

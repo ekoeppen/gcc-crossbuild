@@ -37,5 +37,5 @@ newlib: config_newlib compile_newlib install_newlib
 clean_newlib:
 	rm -rf ${newlib_build}
 
-clean_binutils_src:
+clean_newlib_src:
 	rm -rf ${newlib_file} ${newlib_src}
