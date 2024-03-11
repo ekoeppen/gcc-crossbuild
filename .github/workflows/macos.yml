@@ -36,7 +36,7 @@ jobs:
     - name: Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: /var/tmp/toolchain-gccmsp430-elf-macos_aarch64.zip
+        artifacts: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_aarch64.zip
         artifactContentType: application/zip
         tag: gcc-${{ inputs.target }}-macos_aarch64-${{ inputs.release }}
         commit: main

@@ -36,7 +36,7 @@ jobs:
     - name: Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: /var/tmp/toolchain-gccmsp430-elf-linux.zip
+        artifacts: /var/tmp/toolchain-gcc${{ inputs.target }}-linux.zip
         artifactContentType: application/zip
         tag: gcc-${{ inputs.target }}-linux-${{ inputs.release }}
         commit: main
