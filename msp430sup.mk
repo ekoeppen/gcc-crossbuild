@@ -12,7 +12,7 @@ ${msp430sup_file}: ${download_dir}
 	curl -q -o $@ -L ${msp430sup_url}
 
 ${msp430sup_src}: ${source_dir} ${msp430sup_file}
-	tar -C ${source_dir} -xf ${msp430sup_file}
+	unzip -o ${msp430sup_file} -d ${source_dir}
 
 copy_msp430sup: ${msp430sup_src}
 	mkdir -p ${PREFIX}/${TARGET}/include/msp430/

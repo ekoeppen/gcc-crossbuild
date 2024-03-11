@@ -31,7 +31,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: zip
-        filename: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_aarch64.zip"
+        filename: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_aarch64.zip
         directory: /var/tmp/build/
     - name: Release
       uses: ncipollo/release-action@v1

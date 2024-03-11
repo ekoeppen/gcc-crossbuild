@@ -14,7 +14,9 @@ else
 PACKAGE_TARGET := ${TARGET}
 endif
 
-pio_package: ${PREFIX}/package.json
+.PHONY: pio_package
+
+pio_package:
 	echo {\"name\":\"toolchain-gcc${PACKAGE_TARGET}\",\
         \"version\":\"${GCC}\",\
         \"description\":\"GNU GCC for ${PACKAGE_TARGET}\",\

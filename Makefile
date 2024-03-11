@@ -19,10 +19,7 @@ download_dir :=    ${base_dir}/download
 source_dir :=      ${base_dir}/source
 build_dir :=       ${base_dir}/build/${TARGET}
 
-.PHONY: clean clean_download clean_source clean_build \
-	compile_binutils config_binutils install_binutils \
-	compile_picolibc config_picolibc install_picolibc \
-	compile_gcc config_gcc install_gcc
+.PHONY: clean clean_download clean_source clean_build sources build_all
 
 ${download_dir}:
 	mkdir -p ${download_dir}
