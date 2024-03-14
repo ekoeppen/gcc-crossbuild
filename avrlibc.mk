@@ -17,6 +17,8 @@ ${avrlibc_src}: ${source_dir} ${avrlibc_file}
 copy_avrio: ${avrlibc_src}
 	mkdir -p ${PREFIX}/${TARGET}/include/avr/
 	cp -R ${avrlibc_src}/include/avr/*.h ${PREFIX}/${TARGET}/include/avr/
+	cp -R ${avrlibc_src}/common/*.h ${PREFIX}/${TARGET}/include/avr/
+	cp -R ${avrlibc_src}/common/*.inc ${PREFIX}/${TARGET}/include/avr/
 	touch ${PREFIX}/${TARGET}/include/avr/version.h
 
 clean_avrlibc:

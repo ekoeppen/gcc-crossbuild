@@ -13,6 +13,7 @@ ${picolibc_file}: ${download_dir}
 
 ${picolibc_src}: ${source_dir} ${picolibc_file}
 	tar -C ${source_dir} -xf ${picolibc_file}
+	cp -r picolibc/* ${picolibc_src}/
 
 ifeq (${TARGET},avr)
 picolibc_extra: copy_avrio
