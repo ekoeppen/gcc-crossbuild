@@ -60,7 +60,7 @@ PHDRS
 
 SECTIONS
 {
-	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
+	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram) - 1);
 
 	.init : {
 		KEEP (*(.text.init.enter))

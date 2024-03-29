@@ -9,6 +9,12 @@ gcc_build :=       ${build_dir}/gcc-${GCC}
     gcc_stage1 gcc_stage2 \
     clean_gcc clean_gcc_src
 
+ifeq (${TARGET},avr)
+avr_opts := --with-double=64 --with-long-double=double
+else
+avr_opts :=
+endif
+
 ${gcc_build}:
 	mkdir -p $@
 
@@ -50,7 +56,8 @@ config_gcc: ${gcc_src} ${gcc_build}
 		--with-libgloss \
 		--with-system-zlib \
 		--with-newlib \
-		--without-libiconv-prefix
+		--without-libiconv-prefix \
+		${avr_opts}
 
 compile_gcc_stage1:
 	cd ${gcc_build} && make -j ${NPROC} all-gcc
