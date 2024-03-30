@@ -1,6 +1,7 @@
 TARGET ?=          avr
 PREFIX ?=          /var/tmp/${TARGET}
 NPROC  ?=          1
+BASE_DIR ?=        /var/tmp/gcc-crossbuild
 
 BINUTILS ?=        2.42
 GCC ?=             13.2.0
@@ -14,10 +15,9 @@ else
 PICOLIBC_TARGET = ${TARGET}
 endif
 
-base_dir :=        /var/tmp/gcc-crossbuild
-download_dir :=    ${base_dir}/download
-source_dir :=      ${base_dir}/source
-build_dir :=       ${base_dir}/build/${TARGET}
+download_dir :=    ${BASE_DIR}/download
+source_dir :=      ${BASE_DIR}/source
+build_dir :=       ${BASE_DIR}/build/${target}
 
 .PHONY: clean clean_download clean_source clean_build sources build_all
 

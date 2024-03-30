@@ -13,7 +13,7 @@ ${picolibc_file}: ${download_dir}
 
 ${picolibc_src}: ${source_dir} ${picolibc_file}
 	tar -C ${source_dir} -xf ${picolibc_file}
-	cp -r picolibc/* ${picolibc_src}/
+	cp -r picolibc/picocrt ${picolibc_src}/
 
 ifeq (${TARGET},avr)
 picolibc_extra: copy_avrio
@@ -44,6 +44,7 @@ install_picolibc:
 	cd ${picolibc_build} && \
 		PATH=${PREFIX}/bin:"${PATH}" && \
 	ninja install
+	cp picolibc/*.ld ${PREFIX}/${TARGET}/lib/
 
 picolibc: config_picolibc compile_picolibc install_picolibc
 

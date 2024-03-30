@@ -9,6 +9,12 @@ gcc_build :=       ${build_dir}/gcc-${GCC}
     gcc_stage1 gcc_stage2 \
     clean_gcc clean_gcc_src
 
+ifeq (${TARGET},avr)
+avr_opts := --with-double=64 --with-long-double=double
+else
+avr_opts :=
+endif
+
 ${gcc_build}:
 	mkdir -p $@
 
@@ -18,6 +24,8 @@ ${gcc_file}: ${download_dir}
 ${gcc_src}: ${source_dir} ${gcc_file}
 	tar -C ${source_dir} -xf ${gcc_file}
 	sed -ibak 's/__AVR__/__AVR_LIBC__/g' ${gcc_src}/libstdc++-v3/src/filesystem/ops-common.h
+	mv ${gcc_src}/gcc/config/avr/avr-mcus.def ${gcc_src}/gcc/config/avr/avr-mcus.def.orig
+	awk '/"avrxmega|"avr2",|"avr5",|"avr25,"/{print $0}' ${gcc_src}/gcc/config/avr/avr-mcus.def.orig > ${gcc_src}/gcc/config/avr/avr-mcus.def
 	cd ${gcc_src} && ./contrib/download_prerequisites
 
 config_gcc: ${gcc_src} ${gcc_build}
@@ -50,7 +58,8 @@ config_gcc: ${gcc_src} ${gcc_build}
 		--with-libgloss \
 		--with-system-zlib \
 		--with-newlib \
-		--without-libiconv-prefix
+		--without-libiconv-prefix \
+		${avr_opts}
 
 compile_gcc_stage1:
 	cd ${gcc_build} && make -j ${NPROC} all-gcc
