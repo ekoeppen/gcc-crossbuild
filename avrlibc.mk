@@ -21,6 +21,27 @@ copy_avrio: ${avrlibc_src}
 	cp -R ${avrlibc_src}/common/*.inc ${PREFIX}/${TARGET}/include/avr/
 	touch ${PREFIX}/${TARGET}/include/avr/version.h
 
+config_avrlibc: ${avrlibc_src} ${avrlibc_build}
+	cd ${avrlibc_src} && \
+		PATH=${PREFIX}/bin:"${PATH}" && ./bootstrap
+	cd ${avrlibc_build} && \
+		PATH=${PREFIX}/bin:"${PATH}" && \
+		${avrlibc_src}/configure \
+			--prefix=${PREFIX} \
+			--host=${TARGET}
+
+compile_avrlibc:
+	cd ${avrlibc_build} && \
+		PATH=${PREFIX}/bin:"${PATH}" && \
+		make -j ${NPROC}
+
+install_avrlibc:
+	cd ${avrlibc_build} && \
+		PATH=${PREFIX}/bin:"${PATH}" && \
+		make install
+
+avrlibc: config_avrlibc compile_avrlibc install_avrlibc
+
 clean_avrlibc:
 	rm -rf ${avrlibc_build}
 
