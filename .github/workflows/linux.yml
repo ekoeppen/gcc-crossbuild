@@ -22,7 +22,10 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
+    - name: Config ${{ inputs.target }}
+      run: echo Target ${{ inputs.target }}
+    - name: Checkout
+      uses: actions/checkout@v4
     - name: Install dependencies
       run: sudo apt-get install -y meson
     - name: Compile
