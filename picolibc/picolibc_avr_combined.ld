@@ -46,7 +46,7 @@ MEMORY
 		ORIGIN = DEFINED(__flash) ? __flash : 0x0000,
 		LENGTH = DEFINED(__flash_size) ? __flash_size : 0x1000
 	data (r) :
-		ORIGIN = 0x8000
+		ORIGIN = 0x00802000,
 		LENGTH = 0x8000
 	ram (w!rx) :
 		ORIGIN = DEFINED(__ram) ? __ram : 0x00800060,
@@ -100,6 +100,7 @@ SECTIONS
 		*(.srodata.cst4)
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
+		*(.jumptables.*)
 
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(8);
@@ -118,7 +119,7 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
-	} AT>data :text
+	} AT>flash :text
 
 	.data.rel.ro : {
 
