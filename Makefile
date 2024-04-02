@@ -17,7 +17,7 @@ endif
 
 download_dir :=    ${BASE_DIR}/download
 source_dir :=      ${BASE_DIR}/source
-build_dir :=       ${BASE_DIR}/build/${target}
+build_dir :=       ${BASE_DIR}/build/${TARGET}
 
 .PHONY: clean clean_download clean_source clean_build sources build_all
 
@@ -26,6 +26,9 @@ ${download_dir}:
 
 ${source_dir}:
 	mkdir -p ${source_dir}
+
+${build_dir}:
+	mkdir -p ${build_dir}
 
 clean_download:
 	rm -rf ${download_dir}

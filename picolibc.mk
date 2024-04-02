@@ -14,7 +14,8 @@ ${picolibc_file}: ${download_dir}
 ${picolibc_src}: ${source_dir} ${picolibc_file}
 	tar -C ${source_dir} -xf ${picolibc_file}
 	cp -r picolibc/picocrt ${picolibc_src}/
-	sed -ibak -E 's/crt(0|0-%\*|begin|end)%O%s/crt\1%O/g;' ${picolibc_src}/meson.build
+	sed -i.bak -E 's/crt(0|0-%\*|begin|end)%O%s/crt\1%O/g;s/-isystem/-idirafter/' \
+		${picolibc_src}/meson.build
 
 ifeq (${TARGET},avr)
 picolibc_extra: copy_avrio
