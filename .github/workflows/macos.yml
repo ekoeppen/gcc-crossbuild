@@ -11,6 +11,13 @@ on:
           - arm-none-eabi
           - msp430-elf
           - avr
+      host:
+        description: Host
+        default: aarch64
+        type: choice
+        options:
+          - aarch64
+          - x86_64
       release:
         description: Release
         default: 13.2.0-1
@@ -18,12 +25,12 @@ on:
 
 jobs:
   crossbuild:
-    runs-on: macos-14
+    runs-on: macos-13
     permissions:
       contents: write
     steps:
     - name: Config ${{ inputs.target }}
-      run: echo Target ${{ inputs.target }}
+      run: echo Target ${{ inputs.target }} Host ${{ inputs.host }}
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install dependencies
@@ -34,13 +41,13 @@ jobs:
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: zip
-        filename: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_aarch64.zip
+        filename: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_${{ inputs.host }}.zip
         directory: /var/tmp/build/
     - name: Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_aarch64.zip
+        artifacts: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_${{ inputs.host }}.zip
         artifactContentType: application/zip
-        tag: gcc-${{ inputs.target }}-macos_aarch64-${{ inputs.release }}
+        tag: gcc-${{ inputs.target }}-macos_${{ inputs.host }}-${{ inputs.release }}
         commit: main
         allowUpdates: true
