@@ -88,7 +88,7 @@ SECTIONS
 		PROVIDE (etext = __text_end);
 	} >flash AT>flash :text
 
-	.rodata ADDR(.text) + SIZEOF(.text) + 0x8000 :
+	.rodata __text_end + 0x8000 : AT(__text_end + 0x8000)
 	{
 		/* read-only data */
 		*(.rdata)
@@ -119,7 +119,7 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
 		PROVIDE_HIDDEN ( __fini_array_end = . );
-	} AT>flash :text
+	} >flash :text
 
 	.data.rel.ro : {
 
