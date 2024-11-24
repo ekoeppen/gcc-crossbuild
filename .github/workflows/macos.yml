@@ -20,7 +20,11 @@ on:
           - x86_64
       release:
         description: Release
-        default: 13.2.0-1
+        default: 1
+        type: string
+      gcc:
+        description: GCC Version
+        default: 13.2.0
         type: string
 
 jobs:
@@ -36,7 +40,7 @@ jobs:
     - name: Install dependencies
       run: brew install meson texinfo
     - name: Compile
-      run: make NPROC=4 TARGET=${{ inputs.target }} PREFIX=/var/tmp/build build_all
+      run: make NPROC=4 GCC=${{ inputs.gcc }} TARGET=${{ inputs.target }} PREFIX=/var/tmp/build build_all
     - name: Package
       uses: thedoctor0/zip-release@0.7.5
       with:
@@ -48,6 +52,6 @@ jobs:
       with:
         artifacts: /var/tmp/toolchain-gcc${{ inputs.target }}-macos_${{ inputs.host }}.zip
         artifactContentType: application/zip
-        tag: gcc-${{ inputs.target }}-macos_${{ inputs.host }}-${{ inputs.release }}
+        tag: gcc-${{ inputs.target }}-macos_${{ inputs.host }}-${{ inputs.gcc }}-${{ inputs.release }}
         commit: main
         allowUpdates: true
